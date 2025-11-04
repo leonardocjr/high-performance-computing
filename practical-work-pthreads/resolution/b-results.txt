@@ -1,0 +1,19 @@
+Test 1.
+real    3m25.632s
+user    3m25.554s
+sys     0m0.003s
+
+
+Test 2.
+real    3m25.325s
+user    3m25.286s
+sys     0m0.001s
+
+
+Test 3.
+real    3m25.716s
+user    3m25.655s
+sys     0m0.001s
+
+
+

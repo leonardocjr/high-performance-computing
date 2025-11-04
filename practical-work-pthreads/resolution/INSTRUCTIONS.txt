@@ -1,0 +1,8 @@
+to join in node-7
+
+ssh -X rocks-node-7
+
+Control + C to leave
+
+
+make clean and make to compile

@@ -1,0 +1,25 @@
+if "./appendix_1-create-many-processes.exe" returns
+	Failed on the creation of process i=18641
+	fork: Resource temporarily unavailable
+it is because you are trying to get above your "max user processes" limit; 
+your current value may be retrieved by
+	ulimit -u
+		62145
+this value gives the maximum number of simultaneous live processes under your username;
+you can always decrease this value
+	ulimit -u 62000
+	ulimit -u
+		62000	
+but increasing requires root privileges:
+	sudo vi /etc/security/limits.conf
+	...
+	rufino          soft    nproc           70000
+	rufino          hard    nproc           70000
+these changes will be applied after reboot (or if you logout and login);
+an alternative is to use ssh onto the localhost to simulate a new login:
+	ssh rufino@localhost
+	ulimit -u
+		70000
+now, verify if "./appendix_1-create-many-processes.exe" creates all processes; 
+you can always try to increase the limit (70000) to a higher value, if necessary.
+

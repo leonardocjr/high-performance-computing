@@ -1,0 +1,69 @@
+#include <stdio.h>
+#include <math.h>
+#include <pthread.h>
+
+#define NUM_TERMS 100000000L
+#define NUM_WORKERS (1+4) // includes main
+
+typedef struct {
+    unsigned long begin;
+    unsigned long end;
+} slice_t;
+slice_t GLOBAL_slices[NUM_WORKERS];
+
+double GLOBAL_sum=0.0;
+pthread_mutex_t mutex=PTHREAD_MUTEX_INITIALIZER;
+
+void *aThread(void *arg)
+{
+ unsigned long tid=(unsigned long)arg;
+ unsigned long k;
+ double factor = 1.0;
+ unsigned long begin=GLOBAL_slices[tid].begin, end=GLOBAL_slices[tid].end;
+ 
+ printf("thread %lu: begin = %lu end = %lu\n", tid, begin, end);
+ if (begin % 2 != 0) factor = -1.0;
+ for (k=begin; k<=end; k++) {
+   pthread_mutex_lock(&mutex);
+   GLOBAL_sum += factor/(2*k+1);
+   pthread_mutex_unlock(&mutex);
+   factor = -factor;
+ }
+ 
+ return(NULL);
+}
+
+int main()
+{
+ pthread_t threads[NUM_WORKERS];
+ unsigned long t;
+ double approxPI = 0.0;
+ unsigned long slice_width, slice_remainder;
+ 
+ slice_width=NUM_TERMS/NUM_WORKERS;
+ slice_remainder=NUM_TERMS%NUM_WORKERS;
+
+ for(t=0;t<NUM_WORKERS;t++){
+
+     if (t==0) GLOBAL_slices[0].begin = 0;
+     else GLOBAL_slices[t].begin = GLOBAL_slices[t-1].end+1;     
+
+     GLOBAL_slices[t].end = GLOBAL_slices[t].begin + slice_width - 1;
+     if (slice_remainder > 0) { GLOBAL_slices[t].end++; slice_remainder --; }
+
+     if (t>0) pthread_create(&threads[t], NULL, aThread, (void *)t);
+ }
+
+ aThread(0);
+
+ for(t=0; t<NUM_WORKERS; t++) {
+    if (t>0) pthread_join(threads[t], NULL);
+ }
+
+ approxPI = 4.0*GLOBAL_sum;
+ printf("thread main: approx PI = %.20g\n", approxPI);	
+ printf("thread main: \"true\" PI = %.20g\n", M_PI);	
+ printf("thread main: abs error = %.20g\n", fabs(M_PI-approxPI));	
+ 
+ pthread_exit(NULL); 
+}

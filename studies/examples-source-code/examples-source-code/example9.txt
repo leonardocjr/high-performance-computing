@@ -1,0 +1,36 @@
+########################################
+A,B,C,D,E comentado; F,G descomentado;
+--> pthread_mutex_destroy devolve EBUSY
+
+########################################
+A,B,C,F comentado; D,E,G descomentado;
+--> o pthread_join garante que pthread_mutex_destroy nunca devolve EBUSY; retorna sempre 0 (sucesso)
+
+########################################
+A,B,C,D,E,F comentado
+
+--> pthread_mutex_destroy pode ou não devolver EBUSY
+
+--> se devolver EBUSY, isso não afeta a integridade do lock; a thread 1 e 2 continuam a executar em separado
+2: before sleep
+main: ret=16 (EBUSY=16)
+2: after sleep
+1: before sleep
+1: after sleep
+
+--> se devolver 0 (sucesso), isso afeta a integridade do lock; a thread 1 e 2 passam a executar em paralelo; notar que as manpages indicam que é indefinido o resultado da remoção de um mutex locked; aqui o efeito parece ser que as threads deixam de bloquear no mutex
+main: ret=0 (EBUSY=16)
+2: before sleep
+1: before sleep
+1: after sleep
+2: after sleep
+
+########################################
+A,B,C descomentado; D,E,F,G (des)comentado
+--> A garante que uma das threads (1 ou 2) adquire o lock e chega a sleep(5); a outra thread ficará bloqueada em pthread_mutex_lock
+--> quando B e C são executados, a thread que tem o lock e está em sleep é cancelada (pois sleep é um cancelation point), mas isso não liberta o lock; donde, a outra thread que estava bloqueada em pthread_mutex_lock ficará bloqueada para sempre; notar que mesmo que G seja executado, vai dar EBUSY pois o lock está comprometido
+
+
+
+
+
