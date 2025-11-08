@@ -3,8 +3,8 @@ MFLAGS=-lm
 TFLAGS=-pthread
 
 #use only one line (1st for demonstration or benchmarking, 2nd for profiling)
-CFLAGS=-Wall -O2
-#CFLAGS=-Wall -O0 -g
+#CFLAGS=-Wall -O2
+CFLAGS=-Wall -O0 -g
 
 #use only one line, depending on the versions to be compiled
 all: nbody-serial.exe

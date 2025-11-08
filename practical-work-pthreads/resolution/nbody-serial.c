@@ -8,8 +8,8 @@ typedef struct{
 	double x,y,z;
 }vector;
  
-int GLOBAL_numBodies=15; // default number of bodies
-int GLOBAL_numSteps=30000; // default number of time steps (1 million)
+int GLOBAL_numBodies=300; // default number of bodies
+int GLOBAL_numSteps=3000; // default number of time steps (1 million)
 
 int GLOBAL_windowWidth=800; // default window width is 800 pixels
 int GLOBAL_windowHeight=800; // default window height is 800 pixels
